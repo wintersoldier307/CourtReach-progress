@@ -1,0 +1,57 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container-max py-8">
+    <a href="{% url 'admin_scouts' %}" class="text-blue-500 mb-4 inline-block">← Back to scouts</a>
+    <div class="card">
+        <!-- Profile Header with Picture -->
+        <div class="flex items-start space-x-6 mb-6 pb-6 border-b">
+            {% if scout.profile_picture %}
+                <img src="{{ scout.profile_picture.url }}" alt="Profile" class="w-32 h-32 rounded-full object-cover">
+            {% else %}
+                <div class="w-32 h-32 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                    <span class="text-5xl font-bold text-white">{{ scout.first_name|first|default:scout.username|first }}</span>
+                </div>
+            {% endif %}
+            
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold mb-2">{{ scout.get_full_name|default:scout.username }}</h1>
+                <p class="text-gray-600">@{{ scout.username }}</p>
+
+                <div class="mt-4">
+                    {% if scout.is_verified %}
+                        <span class="badge-premium">✓ Verified Scout</span>
+                    {% else %}
+                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded text-sm">Awaiting Verification</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h3 class="font-bold">Email</h3>
+                <p>{{ scout.email|default:"—" }}</p>
+            </div>
+            <div>
+                <h3 class="font-bold">First Name</h3>
+                <p>{{ scout.first_name|default:"—" }}</p>
+            </div>
+            <div>
+                <h3 class="font-bold">Last Name</h3>
+                <p>{{ scout.last_name|default:"—" }}</p>
+            </div>
+            <div>
+                <h3 class="font-bold">Joined</h3>
+                <p>{{ scout.date_joined|date:"SHORT_DATE_FORMAT" }}</p>
+            </div>
+        </div>
+
+        {% if not scout.is_verified %}
+        <div class="mt-6">
+            <a href="{% url 'verify_scout' scout.id %}" class="btn-brand">Verify Scout</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

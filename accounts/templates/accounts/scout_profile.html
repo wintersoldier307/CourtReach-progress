@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container-max py-8">
+    <h1 class="text-2xl font-bold mb-4">Scout Profile</h1>
+    
+    <!-- Profile Picture Section -->
+    <div class="card mb-6">
+        <div class="text-center">
+            {% if scout.profile_picture %}
+                <img src="{{ scout.profile_picture.url }}" alt="Profile" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
+            {% else %}
+                <div class="w-32 h-32 rounded-full mx-auto mb-4 bg-blue-500 flex items-center justify-center">
+                    <span class="text-4xl font-bold text-white">{{ scout.first_name|first|default:scout.username|first }}</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Profile Info -->
+    <div class="card mb-6">
+        <h2 class="text-xl font-bold mb-4">{{ scout.get_full_name|default:scout.username }}</h2>
+        
+        <ul class="space-y-2">
+            <li><strong>Username:</strong> {{ scout.username }}</li>
+            <li><strong>Email:</strong> {{ scout.email }}</li>
+            <li><strong>Verification Status:</strong> 
+                {% if scout.is_verified %}
+                    <span class="badge-premium">✓ Verified</span>
+                {% else %}
+                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm">Pending Verification</span>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <a href="{% url 'edit_scout_profile' %}" class="btn-brand">Edit Profile</a>
+        {% if scout.is_verified %}
+            <a href="{% url 'search_players' %}" class="btn-outline ml-2">Search Players</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

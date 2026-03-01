@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Project design tokens */
+:root{
+  --brand: #0f172a; /* dark navy */
+  --brand-accent: #1f6feb; /* bright blue */
+  --accent: #10b981; /* green */
+  --muted: #6b7280;
+}
+
+/* Typography refinements */
+.brand-heading {
+  @apply text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900;
+}
+.brand-sub {
+  @apply text-lg text-gray-700;
+}
+
+/* Buttons */
+.btn-brand{
+  background-color: var(--brand-accent);
+  @apply text-white px-4 py-2 rounded-md hover:opacity-95 transition inline-block;
+}
+.btn-outline{
+  @apply border border-gray-300 text-gray-800 px-3 py-1 rounded-md hover:bg-gray-50 transition;
+}
+
+/* Card */
+.card{
+  @apply bg-white rounded-lg shadow-sm p-4 transition transform;
+}
+.card-hover{
+  @apply hover:shadow-2xl hover:-translate-y-1;
+}
+
+.player-avatar{
+  @apply w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold;
+}
+
+/* Navbar helpers */
+.nav-link{
+  @apply px-3 py-2 rounded-md text-sm font-medium text-gray-800 hover:text-white hover:bg-gray-800/5 transition;
+}
+
+/* Utility to show a premium badge */
+.badge-premium{
+  @apply inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs px-2 py-1 rounded-full font-semibold;
+}
+
+/* Responsive container refinements */
+.container-max{
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Small accessibility focus state */
+.focus-ring:focus{
+  @apply outline-none ring-2 ring-offset-2 ring-indigo-300;
+}

@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container-max py-8">
+    <h1 class="text-2xl font-bold mb-6">Edit Scout Profile</h1>
+    
+    <form method="post" enctype="multipart/form-data" class="card max-w-2xl">
+        {% csrf_token %}
+        
+        <!-- Profile Picture Upload -->
+        <div class="mb-6">
+            <label class="block font-bold mb-2">Profile Picture</label>
+            {% if form.profile_picture %}
+                <div class="flex items-center space-x-4">
+                    {% if form.instance.profile_picture %}
+                        <img src="{{ form.instance.profile_picture.url }}" alt="Current" class="w-24 h-24 rounded-full object-cover">
+                    {% else %}
+                        <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                            <span class="text-2xl text-gray-500">No image</span>
+                        </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        {{ form.profile_picture }}
+                        <p class="text-sm text-gray-600 mt-2">JPG, PNG, or GIF. Max 5MB.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Form Fields -->
+        <div class="space-y-4">
+            {% for field in form %}
+                {% if field.name != 'profile_picture' %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block font-bold mb-1">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="mt-6 flex space-x-4">
+            <button type="submit" class="btn-brand">Save Profile</button>
+            <a href="{% url 'scout_profile' %}" class="btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input[type="file"],
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="url"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        font-family: inherit;
+    }
+    
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus,
+    input[type="url"]:focus,
+    select:focus,
+    textarea:focus,
+    input[type="file"]:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
+{% endblock %}

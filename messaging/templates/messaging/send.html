@@ -1,0 +1,114 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="cr-send-page">
+    <div class="cr-send-card">
+        <div class="cr-send-card__head">
+            <div class="cr-avatar cr-avatar--md">
+                <span>{{ receiver.first_name|slice:":1"|upper }}{{ receiver.last_name|slice:":1"|upper }}</span>
+            </div>
+            <div>
+                <h1 class="cr-send-card__title">New Message</h1>
+                <p class="cr-send-card__to">To: <span>{{ receiver.get_full_name|default:receiver.username }}</span></p>
+            </div>
+        </div>
+
+        <form method="post" class="cr-send-form">
+            {% csrf_token %}
+            <textarea
+                name="content"
+                placeholder="Write your message here…"
+                class="cr-send-textarea"
+                rows="6"
+            ></textarea>
+            <div class="cr-send-form__footer">
+                <a href="{% url 'inbox' %}" class="cr-btn cr-btn--ghost">Cancel</a>
+                <button type="submit" class="cr-btn cr-btn--brand">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Send Message
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.cr-send-page { max-width: 560px; }
+
+.cr-send-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.cr-send-card__head {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface-2);
+}
+
+.cr-send-card__title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 1.125rem;
+    letter-spacing: .04em; text-transform: uppercase;
+    color: #fff; margin: 0 0 .15rem;
+}
+
+.cr-send-card__to {
+    font-size: .8rem; color: var(--c-muted); margin: 0;
+}
+.cr-send-card__to span { color: var(--c-muted-light); font-weight: 500; }
+
+.cr-send-form { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+.cr-send-textarea {
+    background: var(--c-surface-2) !important;
+    border: 1px solid var(--c-border) !important;
+    border-radius: 10px !important;
+    padding: .875rem 1rem !important;
+    color: var(--c-text) !important;
+    font-family: 'Barlow', sans-serif !important;
+    font-size: .9rem !important;
+    line-height: 1.6 !important;
+    resize: vertical !important;
+    outline: none !important;
+    width: 100%;
+    transition: border-color .18s !important;
+    min-height: 140px;
+}
+.cr-send-textarea:focus {
+    border-color: rgba(249,115,22,.5) !important;
+    box-shadow: 0 0 0 3px rgba(249,115,22,.1) !important;
+}
+.cr-send-textarea::placeholder { color: var(--c-muted) !important; }
+
+.cr-send-form__footer { display: flex; justify-content: flex-end; gap: .625rem; }
+
+/* Buttons */
+.cr-btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:.375rem;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:.875rem;
+    letter-spacing:.07em; text-transform:uppercase; text-decoration:none;
+    border-radius:6px; padding:.55rem 1.25rem; cursor:pointer;
+    transition:background .18s,box-shadow .18s,transform .15s;
+    white-space:nowrap; line-height:1; border:none;
+}
+.cr-btn--brand { background:var(--c-accent); color:#fff; }
+.cr-btn--brand:hover { background:#ea6b0b; box-shadow:0 0 20px var(--c-accent-glow); transform:translateY(-1px); color:#fff; }
+.cr-btn--ghost { background:transparent; color:var(--c-muted-light); border:1px solid var(--c-border); }
+.cr-btn--ghost:hover { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2); color:#fff; }
+
+/* Avatar */
+.cr-avatar {
+    border-radius:50%; background:linear-gradient(135deg,#162336,#1a2a3f);
+    border:1.5px solid var(--c-border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--c-accent);
+    overflow:hidden; flex-shrink:0;
+}
+.cr-avatar--md { width:44px; height:44px; font-size:.95rem; }
+</style>
+
+{% endblock %}

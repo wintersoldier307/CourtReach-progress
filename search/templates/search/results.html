@@ -1,0 +1,249 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="cr-search-page">
+
+    <div class="cr-page-head">
+        <h1 class="cr-page-title">Search Players</h1>
+    </div>
+
+    <!-- ── Filters ── -->
+    <div class="cr-filters-card">
+        <form method="get" class="cr-filters-form">
+            <div class="cr-filter-group">
+                <label for="f-position">Position</label>
+                <input type="text" id="f-position" name="position" placeholder="e.g. Point Guard" value="{{ request.GET.position }}">
+            </div>
+            <div class="cr-filter-group">
+                <label for="f-country">Country</label>
+                <input type="text" id="f-country" name="country" placeholder="e.g. Rwanda" value="{{ request.GET.country }}">
+            </div>
+            <div class="cr-filter-group">
+                <label for="f-level">Playing Level</label>
+                <input type="text" id="f-level" name="playing_level" placeholder="e.g. Semi-Pro" value="{{ request.GET.playing_level }}">
+            </div>
+            <div class="cr-filter-group">
+                <label for="f-age-min">Age Min</label>
+                <input type="number" id="f-age-min" name="age_min" placeholder="18" value="{{ request.GET.age_min }}">
+            </div>
+            <div class="cr-filter-group">
+                <label for="f-age-max">Age Max</label>
+                <input type="number" id="f-age-max" name="age_max" placeholder="35" value="{{ request.GET.age_max }}">
+            </div>
+            <div class="cr-filter-group">
+                <label for="f-ppg">Min PPG</label>
+                <input type="number" step="0.1" id="f-ppg" name="min_ppg" placeholder="0.0" value="{{ request.GET.min_ppg }}">
+            </div>
+            <div class="cr-filters-form__action">
+                <button type="submit" class="cr-btn cr-btn--brand">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Filter
+                </button>
+                <a href="{% url 'search_players' %}" class="cr-btn cr-btn--ghost">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── Results ── -->
+    <div class="cr-results-head">
+        <span class="cr-results-count">
+            {% if players %}{{ players|length }} player{{ players|length|pluralize }} found{% endif %}
+        </span>
+    </div>
+
+    <div class="cr-cards-grid">
+        {% for profile in players %}
+        <div class="cr-card">
+            <div class="cr-card__header">
+                <div class="cr-avatar cr-avatar--md">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}">
+                    {% else %}
+                        <span>{{ profile.user.first_name|slice:":1"|upper }}{{ profile.user.last_name|slice:":1"|upper }}</span>
+                    {% endif %}
+                </div>
+                <div class="cr-card__meta">
+                    <h3 class="cr-card__name">{{ profile.user.get_full_name|default:profile.user.username }}</h3>
+                    <p class="cr-card__pos">{{ profile.position|default:"—" }} · {{ profile.country|default:"—" }}</p>
+                </div>
+                <div class="cr-vis-ring" title="Visibility Score">{{ profile.visibility_score }}</div>
+            </div>
+
+            <div class="cr-stats-strip">
+                <div class="cr-stat"><span class="cr-stat__n">{{ profile.ppg|default:"—" }}</span><span class="cr-stat__l">PPG</span></div>
+                <div class="cr-stat"><span class="cr-stat__n">{{ profile.rpg|default:"—" }}</span><span class="cr-stat__l">RPG</span></div>
+                <div class="cr-stat"><span class="cr-stat__n">{{ profile.apg|default:"—" }}</span><span class="cr-stat__l">APG</span></div>
+                <div class="cr-stat"><span class="cr-stat__n cr-stat__n--sm">{{ profile.playing_level|default:"—" }}</span><span class="cr-stat__l">Level</span></div>
+            </div>
+
+            <div class="cr-card__actions">
+                <a href="{% url 'player_detail' profile.user.id %}" class="cr-btn cr-btn--outline cr-btn--flex">View Profile</a>
+                <form method="post" action="{% url 'add_watchlist' profile.id %}" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="cr-btn cr-btn--watch" title="Add to Watchlist">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Watch
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="cr-empty-state">No players match your filters — try broadening your search.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.cr-search-page { display: flex; flex-direction: column; gap: 1.5rem; }
+
+/* Page heading */
+.cr-page-head { margin-bottom: -.5rem; }
+.cr-page-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 1.75rem;
+    letter-spacing: .04em; text-transform: uppercase;
+    color: #fff; margin: 0;
+}
+
+/* ── Filter card ── */
+.cr-filters-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+}
+
+.cr-filters-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: .875rem;
+    align-items: end;
+}
+
+.cr-filter-group { display: flex; flex-direction: column; gap: .35rem; }
+
+.cr-filter-group label {
+    font-size: .7rem !important;
+    font-weight: 700 !important;
+    letter-spacing: .1em !important;
+    text-transform: uppercase !important;
+    color: var(--c-muted) !important;
+    margin: 0 !important;
+}
+
+.cr-filter-group input {
+    background: var(--c-surface-2) !important;
+    border: 1px solid var(--c-border) !important;
+    border-radius: 7px !important;
+    padding: .5rem .75rem !important;
+    color: var(--c-text) !important;
+    font-size: .875rem !important;
+    outline: none !important;
+    transition: border-color .18s !important;
+    width: 100%;
+}
+.cr-filter-group input:focus {
+    border-color: rgba(249,115,22,.5) !important;
+    box-shadow: 0 0 0 3px rgba(249,115,22,.1) !important;
+}
+.cr-filter-group input::placeholder { color: var(--c-muted) !important; }
+
+.cr-filters-form__action {
+    display: flex; gap: .5rem; align-items: center;
+    padding-top: .1rem;
+}
+
+/* Results count */
+.cr-results-head { padding: 0 .25rem; }
+.cr-results-count { font-size: .8rem; color: var(--c-muted); font-weight: 500; }
+
+/* ── Grid & Cards (same design system as home) ── */
+.cr-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+    gap: 1.125rem;
+}
+
+.cr-card {
+    background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: 14px; padding: 1.25rem;
+    display: flex; flex-direction: column; gap: 1rem;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.cr-card:hover { border-color:rgba(249,115,22,.35); transform:translateY(-3px); box-shadow:0 12px 36px rgba(0,0,0,.35); }
+
+.cr-card__header { display:flex; align-items:center; gap:.875rem; }
+.cr-card__meta { flex:1; min-width:0; }
+.cr-card__name {
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem;
+    letter-spacing:.02em; color:#fff; margin:0 0 .15rem;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.cr-card__pos { font-size:.78rem; color:var(--c-muted); margin:0; }
+
+.cr-avatar {
+    border-radius:50%; background:linear-gradient(135deg,#162336,#1a2a3f);
+    border:1.5px solid var(--c-border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700;
+    color:var(--c-accent); overflow:hidden; flex-shrink:0;
+}
+.cr-avatar--md { width:48px; height:48px; font-size:1rem; }
+.cr-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+
+.cr-vis-ring {
+    flex-shrink:0; width:36px; height:36px; border-radius:50%;
+    background:rgba(249,115,22,.1); border:1.5px solid rgba(249,115,22,.3);
+    color:var(--c-accent); font-family:'Barlow Condensed',sans-serif;
+    font-weight:700; font-size:.875rem; display:flex; align-items:center; justify-content:center;
+}
+
+.cr-stats-strip {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:.25rem;
+    background:var(--c-surface-2); border-radius:8px;
+    padding:.625rem .5rem; border:1px solid var(--c-border);
+}
+.cr-stat { display:flex; flex-direction:column; align-items:center; gap:.1rem; }
+.cr-stat__n {
+    font-family:'Barlow Condensed',sans-serif; font-weight:700;
+    font-size:.9375rem; color:#fff; line-height:1;
+}
+.cr-stat__n--sm { font-size:.75rem; }
+.cr-stat__l {
+    font-size:.6rem; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--c-muted);
+}
+
+/* Card action row */
+.cr-card__actions { display:flex; gap:.5rem; }
+.cr-btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:.375rem;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:.875rem;
+    letter-spacing:.07em; text-transform:uppercase; text-decoration:none;
+    border-radius:6px; padding:.5rem 1rem; cursor:pointer;
+    transition:background .18s,box-shadow .18s,border-color .18s,transform .15s;
+    white-space:nowrap; line-height:1; border:none;
+}
+.cr-btn--brand  { background:var(--c-accent); color:#fff; border:none; }
+.cr-btn--brand:hover { background:#ea6b0b; box-shadow:0 0 20px var(--c-accent-glow); transform:translateY(-1px); color:#fff; }
+.cr-btn--ghost  { background:transparent; color:var(--c-muted-light); border:1px solid var(--c-border); }
+.cr-btn--ghost:hover { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2); color:#fff; }
+.cr-btn--outline{ background:transparent; color:var(--c-muted-light); border:1px solid var(--c-border); }
+.cr-btn--outline:hover { background:rgba(249,115,22,.07); border-color:rgba(249,115,22,.4); color:var(--c-accent); }
+.cr-btn--flex   { flex:1; }
+.cr-btn--watch  {
+    background:rgba(34,197,94,.1); color:#4ade80;
+    border:1px solid rgba(34,197,94,.25);
+    padding:.5rem .875rem;
+}
+.cr-btn--watch:hover { background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.4); }
+
+.cr-empty-state {
+    grid-column:1/-1; text-align:center; color:var(--c-muted);
+    padding:3rem; background:var(--c-surface);
+    border:1px dashed var(--c-border); border-radius:12px; font-size:.9rem;
+}
+</style>
+
+{% endblock %}

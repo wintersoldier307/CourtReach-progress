@@ -1,0 +1,303 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="cr-chat">
+
+    <!-- ── Chat header ── -->
+    <div class="cr-chat__header">
+        <a href="{% url 'inbox' %}" class="cr-back">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </a>
+
+        <div class="cr-avatar cr-avatar--md">
+            {% if other_user.playerprofile.profile_picture %}
+                <img src="{{ other_user.playerprofile.profile_picture.url }}" alt="{{ other_user.username }}">
+            {% else %}
+                <span>{{ other_user.first_name|slice:":1"|upper }}{{ other_user.last_name|slice:":1"|upper }}</span>
+            {% endif %}
+        </div>
+
+        <div class="cr-chat__header-info">
+            <span class="cr-chat__header-name">{{ other_user.get_full_name|default:other_user.username }}</span>
+            <span class="cr-chat__header-handle">@{{ other_user.username }}</span>
+        </div>
+    </div>
+
+    <!-- ── Message thread ── -->
+    <div class="cr-chat__thread" id="chat-thread">
+        {% if messages %}
+            {% for msg in messages %}
+            <div class="cr-msg-row {% if msg.sender == request.user %}cr-msg-row--out{% else %}cr-msg-row--in{% endif %}">
+                {% if msg.sender != request.user %}
+                <div class="cr-avatar cr-avatar--sm">
+                    {% if other_user.playerprofile.profile_picture %}
+                        <img src="{{ other_user.playerprofile.profile_picture.url }}" alt="">
+                    {% else %}
+                        <span>{{ other_user.first_name|slice:":1"|upper }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="cr-bubble {% if msg.sender == request.user %}cr-bubble--out{% else %}cr-bubble--in{% endif %}">
+                    <p class="cr-bubble__text">{{ msg.content }}</p>
+                    <span class="cr-bubble__time">{{ msg.timestamp|date:"H:i" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="cr-chat__empty">
+            <div class="cr-chat__empty-icon">💬</div>
+            <p>No messages yet.<br>Say hello to get started!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ── Compose bar ── -->
+    <div class="cr-chat__compose">
+        <form method="post" class="cr-compose-form">
+            {% csrf_token %}
+            <textarea
+                name="content"
+                id="msg-input"
+                placeholder="Type a message…"
+                class="cr-compose-input"
+                rows="1"
+                autocomplete="off"
+            ></textarea>
+            <button type="submit" class="cr-send-btn" aria-label="Send">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<style>
+/* ─── CHAT SHELL ─── */
+.cr-chat {
+    display: flex;
+    flex-direction: column;
+    max-width: 720px;
+    height: calc(100vh - 64px - 5rem); /* viewport minus nav & page padding */
+    min-height: 500px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* ─── HEADER ─── */
+.cr-chat__header {
+    display: flex;
+    align-items: center;
+    gap: .875rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface-2);
+    flex-shrink: 0;
+}
+
+.cr-back {
+    color: var(--c-muted-light);
+    display: flex; align-items: center;
+    text-decoration: none;
+    padding: .35rem;
+    border-radius: 6px;
+    transition: color .15s, background .15s;
+}
+.cr-back:hover { color: #fff; background: rgba(255,255,255,.07); }
+
+.cr-chat__header-info { display: flex; flex-direction: column; gap: .05rem; }
+
+.cr-chat__header-name {
+    font-weight: 700;
+    font-size: .9375rem;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.cr-chat__header-handle {
+    font-size: .75rem;
+    color: var(--c-muted);
+}
+
+/* ─── THREAD ─── */
+.cr-chat__thread {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .625rem;
+    scroll-behavior: smooth;
+}
+
+/* Thin scrollbar */
+.cr-chat__thread::-webkit-scrollbar { width: 4px; }
+.cr-chat__thread::-webkit-scrollbar-track { background: transparent; }
+.cr-chat__thread::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 4px; }
+
+/* ─── EMPTY STATE ─── */
+.cr-chat__empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--c-muted);
+    font-size: .9rem;
+    line-height: 1.7;
+    padding: 3rem 1rem;
+}
+.cr-chat__empty-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+
+/* ─── MESSAGE ROWS ─── */
+.cr-msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: .5rem;
+}
+
+.cr-msg-row--out {
+    flex-direction: row-reverse; /* outgoing on right */
+}
+
+/* ─── BUBBLES ─── */
+.cr-bubble {
+    max-width: 68%;
+    padding: .625rem .875rem;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+
+.cr-bubble--in {
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-bottom-left-radius: 4px;
+}
+
+.cr-bubble--out {
+    background: var(--c-accent);
+    border-bottom-right-radius: 4px;
+}
+
+.cr-bubble__text {
+    font-size: .9rem;
+    line-height: 1.55;
+    color: #fff;
+    margin: 0;
+    word-break: break-word;
+}
+
+.cr-bubble--in .cr-bubble__text { color: var(--c-text); }
+
+.cr-bubble__time {
+    font-size: .65rem;
+    line-height: 1;
+    color: rgba(255,255,255,.55);
+    align-self: flex-end;
+    white-space: nowrap;
+}
+
+.cr-bubble--in .cr-bubble__time { color: var(--c-muted); }
+
+/* ─── COMPOSE BAR ─── */
+.cr-chat__compose {
+    padding: .875rem 1rem;
+    border-top: 1px solid var(--c-border);
+    background: var(--c-surface-2);
+    flex-shrink: 0;
+}
+
+.cr-compose-form {
+    display: flex;
+    align-items: flex-end;
+    gap: .625rem;
+}
+
+.cr-compose-input {
+    flex: 1;
+    background: var(--c-bg) !important;
+    border: 1px solid var(--c-border) !important;
+    border-radius: 22px !important;
+    padding: .65rem 1.1rem !important;
+    color: var(--c-text) !important;
+    font-family: 'Barlow', sans-serif !important;
+    font-size: .9rem !important;
+    line-height: 1.5 !important;
+    resize: none !important;
+    outline: none !important;
+    transition: border-color .18s !important;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.cr-compose-input:focus {
+    border-color: rgba(249,115,22,.5) !important;
+    box-shadow: 0 0 0 3px rgba(249,115,22,.1) !important;
+}
+
+.cr-compose-input::placeholder { color: var(--c-muted) !important; }
+
+.cr-send-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    border: none;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .18s, box-shadow .18s, transform .15s;
+}
+.cr-send-btn:hover {
+    background: #ea6b0b;
+    box-shadow: 0 0 16px var(--c-accent-glow);
+    transform: scale(1.06);
+}
+
+/* ─── SHARED AVATAR ─── */
+.cr-avatar {
+    border-radius: 50%;
+    background: linear-gradient(135deg, #162336, #1a2a3f);
+    border: 1.5px solid var(--c-border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; color: var(--c-accent);
+    overflow: hidden; flex-shrink: 0;
+}
+.cr-avatar--md  { width: 40px; height: 40px; font-size: .9rem; }
+.cr-avatar--sm  { width: 30px; height: 30px; font-size: .75rem; }
+.cr-avatar img  { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+</style>
+
+<script>
+    // Auto-scroll to bottom of thread
+    const thread = document.getElementById('chat-thread');
+    if (thread) thread.scrollTop = thread.scrollHeight;
+
+    // Auto-grow textarea
+    const input = document.getElementById('msg-input');
+    if (input) {
+        input.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        // Submit on Enter (Shift+Enter = newline)
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.closest('form').submit();
+            }
+        });
+    }
+</script>
+
+{% endblock %}

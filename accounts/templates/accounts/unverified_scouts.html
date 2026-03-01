@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Unverified Scouts</h1>
+<ul class="space-y-4">
+    {% for scout in scouts %}
+        <li class="bg-white p-4 rounded shadow flex justify-between items-center">
+            <div>{{ scout.username }} ({{ scout.email }})</div>
+            <a href="{% url 'verify_scout' scout.id %}" class="bg-green-500 text-white px-3 py-1 rounded">Verify</a>
+        </li>
+    {% empty %}
+        <p>No unverified scouts.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

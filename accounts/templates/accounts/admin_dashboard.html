@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container-max py-8">
+    <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card">
+            <div class="text-sm text-gray-600">Players</div>
+            <div class="text-3xl font-bold">{{ players_count }}</div>
+            <a href="{% url 'admin_players' %}" class="text-blue-500 text-sm mt-2 inline-block">View all</a>
+        </div>
+        <div class="card">
+            <div class="text-sm text-gray-600">Scouts</div>
+            <div class="text-3xl font-bold">{{ scouts_count }}</div>
+            <a href="{% url 'admin_scouts' %}" class="text-blue-500 text-sm mt-2 inline-block">View all</a>
+        </div>
+        <div class="card">
+            <div class="text-sm text-gray-600">Unverified Scouts</div>
+            <div class="text-3xl font-bold">{{ unverified_count }}</div>
+            <a href="{% url 'unverified_scouts' %}" class="text-blue-500 text-sm mt-2 inline-block">Verify now</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+        <ul class="space-y-2">
+            <li><a href="{% url 'admin_players' %}" class="text-blue-500 hover:underline">View all Players</a></li>
+            <li><a href="{% url 'admin_scouts' %}" class="text-blue-500 hover:underline">View all Scouts</a></li>
+            <li><a href="{% url 'unverified_scouts' %}" class="text-blue-500 hover:underline">Verify Scouts</a></li>
+            <li><a href="{% url 'admin:index' %}" class="text-blue-500 hover:underline">Django Site Admin</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

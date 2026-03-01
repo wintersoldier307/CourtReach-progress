@@ -1,0 +1,172 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="cr-inbox">
+    <div class="cr-inbox__head">
+        <h1 class="cr-page-title">Inbox</h1>
+        {% if conversations %}
+            <span class="cr-inbox__count">{{ conversations|length }} conversation{{ conversations|length|pluralize }}</span>
+        {% endif %}
+    </div>
+
+    <ul class="cr-inbox__list">
+        {% for conv in conversations %}
+        <li>
+            <a href="{% url 'conversation' conv.user.id %}" class="cr-conv-row {% if conv.unread %}cr-conv-row--unread{% endif %}">
+                <div class="cr-avatar cr-avatar--md">
+                    {% if conv.user.playerprofile.profile_picture %}
+                        <img src="{{ conv.user.playerprofile.profile_picture.url }}" alt="{{ conv.user.username }}">
+                    {% else %}
+                        <span>{{ conv.user.first_name|slice:":1"|upper }}{{ conv.user.last_name|slice:":1"|upper }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="cr-conv-row__body">
+                    <div class="cr-conv-row__top">
+                        <span class="cr-conv-row__name">{{ conv.user.get_full_name|default:conv.user.username }}</span>
+                        <span class="cr-conv-row__time">{{ conv.last_message.timestamp|date:"M d" }}</span>
+                    </div>
+                    <div class="cr-conv-row__preview">
+                        <span class="cr-conv-row__snippet">{{ conv.last_message.content|truncatechars:55 }}</span>
+                        {% if conv.unread %}<span class="cr-unread-dot"></span>{% endif %}
+                    </div>
+                </div>
+            </a>
+        </li>
+        {% empty %}
+        <li class="cr-empty-state">No conversations yet. Search for players and start a conversation.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<style>
+.cr-inbox { max-width: 640px; }
+
+.cr-inbox__head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.cr-page-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 1.75rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+}
+
+.cr-inbox__count {
+    font-size: .8rem;
+    color: var(--c-muted);
+    font-weight: 500;
+}
+
+.cr-inbox__list {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: .25rem;
+}
+
+/* ─── Conversation row ─── */
+.cr-conv-row {
+    display: flex;
+    align-items: center;
+    gap: .875rem;
+    padding: .875rem 1rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: var(--c-surface);
+    text-decoration: none;
+    transition: background .18s, border-color .18s;
+}
+.cr-conv-row:hover {
+    background: var(--c-surface-2);
+    border-color: var(--c-border);
+}
+.cr-conv-row--unread {
+    background: rgba(249,115,22,.06);
+    border-color: rgba(249,115,22,.15);
+}
+.cr-conv-row--unread:hover {
+    background: rgba(249,115,22,.1);
+}
+
+.cr-conv-row__body { flex: 1; min-width: 0; }
+
+.cr-conv-row__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .25rem;
+}
+
+.cr-conv-row__name {
+    font-weight: 600;
+    font-size: .9375rem;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cr-conv-row--unread .cr-conv-row__name { color: #fff; }
+
+.cr-conv-row__time {
+    font-size: .75rem;
+    color: var(--c-muted);
+    flex-shrink: 0;
+}
+
+.cr-conv-row__preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.cr-conv-row__snippet {
+    font-size: .85rem;
+    color: var(--c-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+.cr-conv-row--unread .cr-conv-row__snippet {
+    color: var(--c-muted-light);
+    font-weight: 500;
+}
+
+.cr-unread-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    flex-shrink: 0;
+    box-shadow: 0 0 6px var(--c-accent-glow);
+}
+
+/* Shared avatar */
+.cr-avatar {
+    border-radius: 50%;
+    background: linear-gradient(135deg, #162336, #1a2a3f);
+    border: 1.5px solid var(--c-border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; color: var(--c-accent);
+    overflow: hidden; flex-shrink: 0;
+}
+.cr-avatar--md { width: 46px; height: 46px; font-size: 1rem; }
+.cr-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+
+.cr-empty-state {
+    text-align: center; color: var(--c-muted);
+    padding: 3rem; background: var(--c-surface);
+    border: 1px dashed var(--c-border); border-radius: 12px; font-size: .9rem;
+}
+</style>
+
+{% endblock %}

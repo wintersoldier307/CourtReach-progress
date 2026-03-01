@@ -1,0 +1,189 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="cr-myprofile">
+
+    <!-- ── Hero card ── -->
+    <div class="cr-profile-hero">
+        <div class="cr-avatar cr-avatar--xl">
+            {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="Profile">
+            {% else %}
+                <span>{{ request.user.first_name|first|upper|default:request.user.username|first|upper }}</span>
+            {% endif %}
+        </div>
+        <div class="cr-profile-hero__info">
+            <h1 class="cr-profile-hero__name">{{ request.user.get_full_name|default:request.user.username }}</h1>
+            <p class="cr-profile-hero__sub">@{{ request.user.username }}</p>
+            <div class="cr-tags">
+                {% if profile.position %}<span class="cr-tag">{{ profile.position }}</span>{% endif %}
+                {% if profile.country %}<span class="cr-tag">{{ profile.country }}</span>{% endif %}
+                {% if profile.playing_level %}<span class="cr-tag">{{ profile.playing_level }}</span>{% endif %}
+                {% if profile.availability %}<span class="cr-tag cr-tag--green">Available</span>{% else %}<span class="cr-tag cr-tag--muted">Unavailable</span>{% endif %}
+            </div>
+        </div>
+        <a href="{% url 'edit_profile' %}" class="cr-btn cr-btn--brand cr-edit-btn">✏ Edit Profile</a>
+    </div>
+
+    <!-- ── Completion bar ── -->
+    <div class="cr-completion-card">
+        <div class="cr-completion-card__top">
+            <span class="cr-completion-card__label">Profile Completion</span>
+            <span class="cr-completion-card__pct">{{ profile.get_completion_percentage }}%</span>
+        </div>
+        <div class="cr-progress-track">
+            <div class="cr-progress-fill" style="width: {{ profile.get_completion_percentage }}%"></div>
+        </div>
+        <p class="cr-completion-card__sub">{{ profile.visibility_score }}/13 fields complete · keep going to boost your visibility!</p>
+    </div>
+
+    <!-- ── Stats band ── -->
+    <div class="cr-stats-band">
+        <div class="cr-sband-stat"><span class="cr-sband-stat__n">{{ profile.ppg|default:"—" }}</span><span class="cr-sband-stat__l">PPG</span></div>
+        <div class="cr-sband-sep"></div>
+        <div class="cr-sband-stat"><span class="cr-sband-stat__n">{{ profile.rpg|default:"—" }}</span><span class="cr-sband-stat__l">RPG</span></div>
+        <div class="cr-sband-sep"></div>
+        <div class="cr-sband-stat"><span class="cr-sband-stat__n">{{ profile.apg|default:"—" }}</span><span class="cr-sband-stat__l">APG</span></div>
+    </div>
+
+    <!-- ── Details grid ── -->
+    <div class="cr-detail-grid">
+        <div class="cr-detail-card">
+            <h2 class="cr-detail-title">Physical</h2>
+            <ul class="cr-dl">
+                <li><span class="cr-dl__k">Height</span><span class="cr-dl__v">{{ profile.height|default:"—" }}</span></li>
+                <li><span class="cr-dl__k">Weight</span><span class="cr-dl__v">{{ profile.weight|default:"—" }}</span></li>
+                <li><span class="cr-dl__k">Age</span><span class="cr-dl__v">{{ profile.age|default:"—" }}</span></li>
+            </ul>
+        </div>
+        <div class="cr-detail-card">
+            <h2 class="cr-detail-title">Background</h2>
+            <ul class="cr-dl">
+                <li><span class="cr-dl__k">Country</span><span class="cr-dl__v">{{ profile.country|default:"—" }}</span></li>
+                <li><span class="cr-dl__k">Playing Level</span><span class="cr-dl__v">{{ profile.playing_level|default:"—" }}</span></li>
+                <li><span class="cr-dl__k">Available</span><span class="cr-dl__v">{% if profile.availability %}Yes{% else %}No{% endif %}</span></li>
+            </ul>
+        </div>
+        {% if profile.highlight_video_url %}
+        <div class="cr-detail-card cr-detail-card--hl">
+            <h2 class="cr-detail-title">Highlights</h2>
+            <a href="{{ profile.highlight_video_url }}" target="_blank" rel="noopener" class="cr-btn cr-btn--brand cr-btn--block">▶ Watch Reel</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<style>
+.cr-myprofile { display:flex; flex-direction:column; gap:1.25rem; max-width:800px; }
+
+/* Hero */
+.cr-profile-hero {
+    display:flex; align-items:center; gap:1.5rem;
+    background:var(--c-surface); border:1px solid var(--c-border);
+    border-radius:16px; padding:1.5rem 1.75rem;
+}
+.cr-profile-hero__info { flex:1; min-width:0; }
+.cr-profile-hero__name {
+    font-family:'Barlow Condensed',sans-serif; font-weight:800;
+    font-size:clamp(1.4rem,3vw,2rem); letter-spacing:.03em;
+    text-transform:uppercase; color:#fff; margin:0 0 .2rem;
+}
+.cr-profile-hero__sub { font-size:.8rem; color:var(--c-muted); margin:0 0 .75rem; }
+
+.cr-tags { display:flex; flex-wrap:wrap; gap:.4rem; }
+.cr-tag {
+    font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:.25rem .65rem; border-radius:999px;
+    background:var(--c-surface-2); border:1px solid var(--c-border); color:var(--c-muted-light);
+}
+.cr-tag--green { background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.25); color:#4ade80; }
+.cr-tag--muted { opacity:.4; }
+
+.cr-edit-btn { flex-shrink:0; }
+
+/* Avatar */
+.cr-avatar {
+    border-radius:50%; background:linear-gradient(135deg,#162336,#1a2a3f);
+    border:2px solid var(--c-border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--c-accent);
+    overflow:hidden; flex-shrink:0;
+}
+.cr-avatar--xl { width:90px; height:90px; min-width:90px; font-size:1.75rem; }
+.cr-avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; border-radius:50%; display:block; }
+
+/* Completion */
+.cr-completion-card {
+    background:var(--c-surface); border:1px solid var(--c-border);
+    border-radius:12px; padding:1.25rem 1.5rem;
+}
+.cr-completion-card__top { display:flex; justify-content:space-between; align-items:center; margin-bottom:.625rem; }
+.cr-completion-card__label { font-size:.8rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--c-muted); }
+.cr-completion-card__pct {
+    font-family:'Barlow Condensed',sans-serif; font-weight:800;
+    font-size:1.1rem; color:var(--c-accent);
+}
+.cr-progress-track {
+    height:6px; background:var(--c-surface-2); border-radius:999px;
+    overflow:hidden; border:1px solid var(--c-border);
+}
+.cr-progress-fill {
+    height:100%; border-radius:999px;
+    background:linear-gradient(90deg, var(--c-accent), #fb923c);
+    transition:width .5s ease;
+}
+.cr-completion-card__sub { font-size:.78rem; color:var(--c-muted); margin:.625rem 0 0; }
+
+/* Stats band */
+.cr-stats-band {
+    display:flex; align-items:center;
+    background:var(--c-surface); border:1px solid var(--c-border);
+    border-radius:12px; padding:.875rem 0;
+}
+.cr-sband-stat { flex:1; display:flex; flex-direction:column; align-items:center; gap:.2rem; }
+.cr-sband-stat__n {
+    font-family:'Barlow Condensed',sans-serif; font-weight:800;
+    font-size:1.75rem; color:#fff; line-height:1;
+}
+.cr-sband-stat__l { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--c-muted); }
+.cr-sband-sep { width:1px; height:40px; background:var(--c-border); flex-shrink:0; }
+
+/* Detail grid */
+.cr-detail-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; }
+.cr-detail-card {
+    background:var(--c-surface); border:1px solid var(--c-border);
+    border-radius:12px; padding:1.25rem;
+}
+.cr-detail-card--hl { border-color:rgba(249,115,22,.2); }
+.cr-detail-title {
+    font-family:'Barlow Condensed',sans-serif; font-weight:700;
+    font-size:.8rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--c-muted); margin:0 0 .875rem;
+}
+.cr-dl { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5rem; }
+.cr-dl li { display:flex; align-items:center; justify-content:space-between; gap:.5rem; font-size:.875rem; }
+.cr-dl__k { color:var(--c-muted); }
+.cr-dl__v { color:#fff; font-weight:500; text-align:right; }
+
+/* Buttons */
+.cr-btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:.375rem;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:.875rem;
+    letter-spacing:.07em; text-transform:uppercase; text-decoration:none;
+    border-radius:6px; padding:.55rem 1.25rem; cursor:pointer;
+    transition:background .18s,box-shadow .18s,transform .15s;
+    white-space:nowrap; line-height:1; border:none;
+}
+.cr-btn--brand { background:var(--c-accent); color:#fff; }
+.cr-btn--brand:hover { background:#ea6b0b; box-shadow:0 0 20px var(--c-accent-glow); transform:translateY(-1px); color:#fff; }
+.cr-btn--block { width:100%; }
+
+@media(max-width:600px) {
+    .cr-profile-hero { flex-direction:column; text-align:center; }
+    .cr-tags { justify-content:center; }
+    .cr-edit-btn { width:100%; justify-content:center; }
+}
+</style>
+
+{% endblock %}

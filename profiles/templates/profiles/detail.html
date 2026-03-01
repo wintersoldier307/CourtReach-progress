@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">{{ profile.user.get_full_name|default:profile.user.username }}</h1>
+<ul class="list-disc pl-5">
+    <li>Position: {{ profile.position }}</li>
+    <li>Height: {{ profile.height }}</li>
+    <li>Weight: {{ profile.weight }}</li>
+    <li>Age: {{ profile.age }}</li>
+    <li>Country: {{ profile.country }}</li>
+    <li>PPG: {{ profile.ppg }}</li>
+    <li>RPG: {{ profile.rpg }}</li>
+    <li>APG: {{ profile.apg }}</li>
+    <li>Availability: {{ profile.availability }}</li>
+    <li>Playing Level: {{ profile.playing_level }}</li>
+    {% if profile.highlight_video_url %}
+    <li>Highlight: <a href="{{ profile.highlight_video_url }}" class="text-blue-500" target="_blank">Watch</a></li>
+    {% endif %}
+</ul>
+
+{% if request.user.is_authenticated and request.user.role == 'SCOUT' %}
+    <a href="{% url 'conversation' profile.user.id %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded">Message</a>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="cr-view-page">
+    <div class="cr-view-card">
+        <div class="cr-view-card__head">
+            <div class="cr-avatar cr-avatar--md">
+                <span>{{ message.sender.first_name|slice:":1"|upper }}{{ message.sender.last_name|slice:":1"|upper }}</span>
+            </div>
+            <div class="cr-view-card__sender-info">
+                <h1 class="cr-view-card__sender">{{ message.sender.get_full_name|default:message.sender.username }}</h1>
+                <p class="cr-view-card__handle">@{{ message.sender.username }}</p>
+            </div>
+        </div>
+
+        <div class="cr-view-card__body">
+            <p class="cr-view-card__content">{{ message.content }}</p>
+        </div>
+
+        <div class="cr-view-card__foot">
+            <a href="{% url 'inbox' %}" class="cr-btn cr-btn--ghost">← Back to Inbox</a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'send_message' message.sender.id %}" class="cr-btn cr-btn--brand">Reply</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.cr-view-page { max-width: 560px; }
+
+.cr-view-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.cr-view-card__head {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface-2);
+}
+
+.cr-view-card__sender {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 1.1rem; letter-spacing: .03em;
+    color: #fff; margin: 0 0 .1rem;
+}
+.cr-view-card__handle { font-size: .8rem; color: var(--c-muted); margin: 0; }
+
+.cr-view-card__body {
+    padding: 1.5rem;
+}
+
+.cr-view-card__content {
+    font-size: .9375rem;
+    color: var(--c-text);
+    line-height: 1.7;
+    margin: 0;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+}
+
+.cr-view-card__foot {
+    display: flex; align-items: center; justify-content: flex-end; gap: .625rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--c-border);
+}
+
+/* Buttons */
+.cr-btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:.375rem;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:.875rem;
+    letter-spacing:.07em; text-transform:uppercase; text-decoration:none;
+    border-radius:6px; padding:.55rem 1.25rem; cursor:pointer;
+    transition:background .18s,box-shadow .18s,transform .15s;
+    white-space:nowrap; line-height:1; border:none;
+}
+.cr-btn--brand { background:var(--c-accent); color:#fff; }
+.cr-btn--brand:hover { background:#ea6b0b; box-shadow:0 0 20px var(--c-accent-glow); color:#fff; }
+.cr-btn--ghost { background:transparent; color:var(--c-muted-light); border:1px solid var(--c-border); }
+.cr-btn--ghost:hover { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2); color:#fff; }
+
+.cr-avatar {
+    border-radius:50%; background:linear-gradient(135deg,#162336,#1a2a3f);
+    border:1.5px solid var(--c-border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--c-accent);
+    overflow:hidden; flex-shrink:0;
+}
+.cr-avatar--md { width:44px; height:44px; font-size:.95rem; }
+</style>
+
+{% endblock %}
