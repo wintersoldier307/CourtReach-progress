@@ -25,9 +25,17 @@ import os
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-f4&dlj3d#lhmv)pti+6qh3%8rgg15(8evw^tno%ed3!q@gxp=@')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_DEBUG', '') != 'False'
+# Interpret DJANGO_DEBUG explicitly;
+# default to False so missing var doesn't enable debug.
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split()
+# Allowed hosts can be provided via env var (space‑separated). If not set,
+# provide a sensible default including the Render domains.
+hosts = os.getenv('DJANGO_ALLOWED_HOSTS', '')
+if hosts:
+    ALLOWED_HOSTS = hosts.split()
+else:
+    ALLOWED_HOSTS = ['courtreach-progress.onrender.com', 'courtreach.onrender.com']
 
 
 # Application definition
