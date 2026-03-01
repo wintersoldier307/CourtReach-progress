@@ -12,5 +12,5 @@ services:
       - key: DJANGO_DEBUG
         value: "False"
       - key: DJANGO_ALLOWED_HOSTS
-        value: "courtreach.onrender.com"
+        value: "courtreach-progress.onrender.com courtreach.onrender.com"
     staticPublishPath: "staticfiles"
